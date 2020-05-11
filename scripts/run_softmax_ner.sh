@@ -16,6 +16,7 @@ CUDA_VISIBLE_DEVICES='1' python ../examples/run_softmax_ner.py \
 --do_train \
 --do_eval \
 --evaluate_during_training \
+--adv_training fgm \
 --num_train_epochs 3 \
 --max_seq_length 128 \
 --logging_steps 0.2 \
