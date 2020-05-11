@@ -15,3 +15,6 @@ def valid_sequence_output(sequence_output, valid_mask, attention_mask):
                 valid_output[i][jj] = sequence_output[i][j]
                 valid_attention_mask[i][jj] = attention_mask[i][j]
     return valid_output, valid_attention_mask
+
+
+

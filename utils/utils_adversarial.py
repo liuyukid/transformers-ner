@@ -1,5 +1,18 @@
 import torch
+try:
+    from apex import amp
+except ImportError:
+    pass
 
+
+def loss_backward(args, loss, optimizer):
+    if args.n_gpu > 1:
+        loss = loss.mean()  # mean() to average on multi-gpu parallel training
+    if args.fp16:
+        with amp.scale_loss(loss, optimizer) as scaled_loss:
+            scaled_loss.backward()
+    else:
+        loss.backward()
 
 
 class FGM():
@@ -44,12 +57,12 @@ class FGM():
                 param.data = self.backup[name]
         self.backup = {}
 
-    def adversarial_training(self, args, inputs):
+    def adversarial_training(self, args, inputs, optimizer):
         self.attack()
         loss = self.model(**inputs)[0]
         if args.n_gpu > 1:
             loss = loss.mean()
-        loss.backward()
+        loss_backward(args, loss, optimizer)
         self.restore()
 
 
@@ -122,7 +135,7 @@ class PGD():
             if param.requires_grad:
                 param.grad = self.grad_backup[name]
 
-    def adversarial_training(self, args, inputs):
+    def adversarial_training(self, args, inputs, optimizer):
         self.backup_grad()
         for t in range(self.K):
             self.attack(is_first_attack=(t==0)) # 在embedding上添加对抗扰动, first attack时备份param.data
@@ -131,9 +144,7 @@ class PGD():
             else:
                 self.restore_grad()
             loss = self.model(**inputs)[0]
-            if args.n_gpu > 1:
-                loss = loss.mean()
-            loss.backward()
+            loss_backward(args, loss, optimizer)
         self.restore()
 
 

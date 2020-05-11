@@ -86,7 +86,6 @@ def convert_examples_to_features(
             - True (XLNet/GPT pattern): A + [SEP] + B + [SEP] + [CLS]
         `cls_token_segment_id` define the segment id associated to the CLS token (0 for BERT, 2 for XLNet)
     """
-
     label_map = {label: i for i, label in enumerate(label_list)}
     span_labels = []
     for label in label_list:
@@ -118,7 +117,7 @@ def convert_examples_to_features(
             start_ids[entity[1]] = span_map[entity[0]]
             end_ids[entity[-1]] = span_map[entity[0]]
         # Account for [CLS] and [SEP] with "- 2" and with "- 3" for RoBERTa.
-        special_tokens_count = tokenizer.num_added_tokens()
+        special_tokens_count = 3 if sep_token_extra else 2
         if len(tokens) > max_seq_length - special_tokens_count:
             tokens = tokens[: (max_seq_length - special_tokens_count)]
             label_ids = label_ids[: (max_seq_length - special_tokens_count)]

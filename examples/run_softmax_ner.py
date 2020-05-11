@@ -219,7 +219,7 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
                 loss.backward()
 
             if args.adv_training:
-                adv.adversarial_training(args, inputs)
+                adv.adversarial_training(args, inputs, optimizer)
 
             tr_loss += loss.item()
             epoch_iterator.set_description('Loss: {}'.format(round(loss.item(), 6)))
