@@ -1,15 +1,23 @@
 from collections import OrderedDict
 
-from transformers import BertConfig, AlbertConfig, ElectraConfig, RobertaConfig, AutoConfig, PretrainedConfig
+from transformers import BertConfig, AlbertConfig, ElectraConfig, RobertaConfig
+from transformers import XLMConfig, DistilBertConfig, CamembertConfig, XLMRobertaConfig
+from transformers import AutoConfig, PretrainedConfig
 
 from models.albert_ner import AlbertCrfForNer, AlbertSoftmaxForNer, AlbertSpanForNer
 from models.bert_ner import BertCrfForNer, BertSoftmaxForNer, BertSpanForNer
 from models.electra_ner import ElectraCrfForNer, ElectraSoftmaxForNer, ElectraSpanForNer
 from models.roberta_ner import RobertaCrfForNer, RobertaSoftmaxForNer, RobertaSpanForNer
+from models.xlm_ner import XLMCrfForNer, XLMSoftmaxForNer, XLMSpanForNer
+from models.distilbert_ner import DistilBertCrfForNer, DistilBertSoftmaxForNer, DistilBertSpanForNer
 
 MODEL_FOR_SOFTMAX_NER_MAPPING = OrderedDict(
     [
+        (XLMConfig, XLMSoftmaxForNer),
+        (DistilBertConfig, DistilBertSoftmaxForNer),
         (RobertaConfig, RobertaSoftmaxForNer),
+        (CamembertConfig, RobertaSoftmaxForNer),
+        (XLMRobertaConfig, RobertaSoftmaxForNer),
         (BertConfig, BertSoftmaxForNer),
         (AlbertConfig, AlbertSoftmaxForNer),
         (ElectraConfig, ElectraSoftmaxForNer),
@@ -18,7 +26,11 @@ MODEL_FOR_SOFTMAX_NER_MAPPING = OrderedDict(
 
 MODEL_FOR_CRF_NER_MAPPING = OrderedDict(
     [
+        (XLMConfig, XLMCrfForNer),
+        (DistilBertConfig, DistilBertCrfForNer),
         (RobertaConfig, RobertaCrfForNer),
+        (CamembertConfig, RobertaCrfForNer),
+        (XLMRobertaConfig, RobertaCrfForNer),
         (BertConfig, BertCrfForNer),
         (AlbertConfig, AlbertCrfForNer),
         (ElectraConfig, ElectraCrfForNer),
@@ -27,7 +39,11 @@ MODEL_FOR_CRF_NER_MAPPING = OrderedDict(
 
 MODEL_FOR_SPAN_NER_MAPPING = OrderedDict(
     [
+        (XLMConfig, XLMSpanForNer),
+        (DistilBertConfig, DistilBertSpanForNer),
         (RobertaConfig, RobertaSpanForNer),
+        (CamembertConfig, RobertaSpanForNer),
+        (XLMRobertaConfig, RobertaSpanForNer),
         (BertConfig, BertSpanForNer),
         (AlbertConfig, AlbertSpanForNer),
         (ElectraConfig, ElectraSpanForNer),
