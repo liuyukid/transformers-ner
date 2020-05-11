@@ -1,7 +1,8 @@
 # transformers-ner
 
 Pytorch-Named-Entity-Recognition-with-transformers
-Support chinese ner and english ner
+
+Support chinese ner and english ner datasets
 
 ### dataset list 
 
