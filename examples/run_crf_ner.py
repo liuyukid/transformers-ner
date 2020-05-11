@@ -41,6 +41,7 @@ from transformers import (
 from models.model_ner import MODEL_FOR_CRF_NER_MAPPING, AutoModelForCrfNer
 
 from utils.utils_ner import convert_examples_to_features, get_labels, read_examples_from_file, collate_fn
+from utils.utils_adversarial import FGM, PGD
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -87,7 +88,7 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
 
     # Prepare optimizer and schedule (linear warmup and decay)
     no_decay = ["bias", "LayerNorm.weight"]
-    bert_parameters = model.bert.named_parameters()
+    bert_parameters = eval('model.{}'.format(args.model_type)).named_parameters()
     classifier_parameters = model.classifier.named_parameters()
     crf_parameters = model.crf.named_parameters()
     args.bert_lr = args.bert_lr if args.bert_lr else args.learning_rate
@@ -144,6 +145,12 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
         model = torch.nn.parallel.DistributedDataParallel(
             model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True
         )
+
+    # adversarial_training
+    if args.adv_training == 'fgm':
+        adv = FGM(model=model, emb_name='word_embeddings')
+    elif args.adv_training == 'pgd':
+        adv = PGD(model=model, emb_name='word_embeddings')
 
     # Train!
     logger.info("***** Running training *****")
@@ -217,6 +224,9 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
                     scaled_loss.backward()
             else:
                 loss.backward()
+
+            if args.adv_training:
+                adv.adversarial_training(args, inputs)
 
             tr_loss += loss.item()
             epoch_iterator.set_description('Loss: {}'.format(round(loss.item(), 6)))
@@ -508,6 +518,8 @@ def main():
     parser.add_argument("--bert_lr", type=float, help="The initial learning rate for BERT.")
     parser.add_argument("--classifier_lr", type=float, help="The initial learning rate of classifier.")
     parser.add_argument("--crf_lr", type=float, help="The initial learning rate of crf")
+    parser.add_argument("--adv_training", default=None, choices=['fgm', 'pgd'], help="fgm adversarial training")
+
     parser.add_argument("--weight_decay", default=0.0, type=float, help="Weight decay if we apply some.")
     parser.add_argument("--adam_epsilon", default=1e-8, type=float, help="Epsilon for Adam optimizer.")
     parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")

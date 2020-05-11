@@ -16,7 +16,7 @@ class ElectraSoftmaxForNer(ElectraPreTrainedModel):
     def __init__(self, config):
         super(ElectraSoftmaxForNer, self).__init__(config)
         self.num_labels = config.num_labels
-        self.bert = ElectraModel(config)
+        self.electra = ElectraModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, config.num_labels)
         self.loss_type = config.loss_type
@@ -33,7 +33,7 @@ class ElectraSoftmaxForNer(ElectraPreTrainedModel):
             valid_mask=None,
             labels=None
     ):
-        outputs = self.bert(
+        outputs = self.electra(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
@@ -70,7 +70,7 @@ class ElectraSoftmaxForNer(ElectraPreTrainedModel):
 class ElectraCrfForNer(ElectraPreTrainedModel):
     def __init__(self, config):
         super(ElectraCrfForNer, self).__init__(config)
-        self.bert = ElectraModel(config)
+        self.electra = ElectraModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, config.num_labels)
         self.crf = CRF(num_tags=config.num_labels, batch_first=True)
@@ -88,7 +88,7 @@ class ElectraCrfForNer(ElectraPreTrainedModel):
             labels=None,
             decode=False,
     ):
-        outputs = self.bert(
+        outputs = self.electra(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
@@ -120,7 +120,7 @@ class ElectraSpanForNer(ElectraPreTrainedModel):
         self.soft_label = config.soft_label
         self.num_labels = config.num_labels
         self.loss_type = config.loss_type
-        self.bert = ElectraModel(config)
+        self.electra = ElectraModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.start_fc = PoolerStartLogits(config.hidden_size, self.num_labels)
         if self.soft_label:
@@ -141,7 +141,7 @@ class ElectraSpanForNer(ElectraPreTrainedModel):
             start_positions=None,
             end_positions=None
     ):
-        outputs = self.bert(
+        outputs = self.electra(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
