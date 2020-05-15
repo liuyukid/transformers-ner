@@ -150,9 +150,9 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
 
     # adversarial_training
     if args.adv_training == 'fgm':
-        adv = FGM(model=model, emb_name='word_embeddings')
+        adv = FGM(model, 'word_embeddings')
     elif args.adv_training == 'pgd':
-        adv = PGD(model=model, emb_name='word_embeddings')
+        adv = PGD(model, 'word_embeddings')
 
     # Train!
     logger.info("***** Running training *****")
@@ -229,7 +229,7 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
                 loss.backward()
 
             if args.adv_training:
-                adv.adversarial_training(args, inputs, optimizer)
+                adv.training(args, inputs, optimizer)
 
             tr_loss += loss.item()
             epoch_iterator.set_description('Loss: {}'.format(round(loss.item(), 6)))
