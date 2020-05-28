@@ -646,7 +646,7 @@ def main():
         label = label.split('-')[-1]
         if label not in span_labels:
             span_labels.append(label)
-    num_labels = len(span_labels)
+    args.num_labels = len(span_labels)
     # Use cross entropy ignore index as padding label id so that only real label ids contribute to the loss later
     pad_token_label_id = CrossEntropyLoss().ignore_index
 
@@ -657,12 +657,12 @@ def main():
     args.model_type = args.model_type.lower()
     config = AutoConfig.from_pretrained(
         args.config_name if args.config_name else args.model_name_or_path,
-        num_labels=num_labels,
         id2label={str(i): label for i, label in enumerate(labels)},
         label2id={label: i for i, label in enumerate(labels)},
         cache_dir=args.cache_dir if args.cache_dir else None,
     )
     #####
+    setattr(config, 'num_labels', args.num_labels)
     setattr(config, 'loss_type', args.loss_type)
     setattr(config, 'soft_label', args.soft_label)
     #####

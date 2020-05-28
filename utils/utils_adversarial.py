@@ -89,7 +89,10 @@ class PGD():
                     param.data = self.project(name, param.data)
 
     def project(self, param_name, param_data):
-        eta = torch.clamp(param_data - self.data[param_name], -self.epsilon, self.epsilon)
+        eta = torch.clamp(param_data - self.data[param_name])
+        norm = torch.norm(eta)
+        if norm > self.epsilon:
+            eta = self.epsilon * eta / norm
         return self.data[param_name] + eta
 
     def training(self, args, inputs, optimizer):
@@ -104,3 +107,12 @@ class PGD():
             loss = self.model(**inputs)[0]
             loss_backward(args, loss, optimizer)
         self.restore_param_data()
+
+
+class FreeAT():
+    def __init__(self, model, param_name, alpha=0.3, epsilon=1.0, K=3):
+        self.model = model
+        self.param_name = param_name
+        self.alpha = alpha
+        self.epsilon = epsilon
+        self.K = K
