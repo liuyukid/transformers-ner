@@ -40,7 +40,7 @@ class FGM():
                 param.data = self.data[name]
         self.data = {}
 
-    def training(self, args, inputs, optimizer):
+    def adversarial_training(self, args, inputs, optimizer):
         self.backup_param_data()
         self.adversarial()
         loss = self.model(**inputs)[0]
@@ -95,7 +95,7 @@ class PGD():
             eta = self.epsilon * eta / norm
         return self.data[param_name] + eta
 
-    def training(self, args, inputs, optimizer):
+    def adversarial_training(self, args, inputs, optimizer):
         self.backup_param_data()
         self.backup_param_grad()
         for k in range(self.K):
