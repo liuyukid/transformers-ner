@@ -150,9 +150,9 @@ def train(args, train_dataset, model, tokenizer, labels, pad_token_label_id):
 
     # adversarial_training
     if args.adv_training == 'fgm':
-        adv = FGM(model, 'word_embeddings')
+        adv = FGM(model, param_name='word_embeddings')
     elif args.adv_training == 'pgd':
-        adv = PGD(model, 'word_embeddings')
+        adv = PGD(model, param_name='word_embeddings')
 
     # Train!
     logger.info("***** Running training *****")
